@@ -12,7 +12,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const DEFAULT_CITIES = [
   {
@@ -326,6 +326,59 @@ function App() {
         setActiveRoute(normalized.route);
       } catch (err) {
         if (!cancelled) {
+          if (mode === "demo") {
+            const fallbackDemo = {
+              current_risk: { time: "NOW", score: 42, level: "CAUTION", temperature: 35.0, apparent_temperature: 39.2, humidity: 68 },
+              forecast_analysis: { current_score: 42, peak_score: 78, peak_time: "+90 min", increase: 36, trend: "ESCALATING" },
+              destination: {
+                name: "Cubbon Park",
+                latitude: 12.9763,
+                longitude: 77.5929,
+                type: "park",
+                temperature: 28.5,
+                feels_like: 31.0,
+                cooling_type: "Dense Shaded Tree Canopy",
+                icon: "🌳",
+                relief_score: 42.0,
+                distance_km: 0.78,
+                walking_minutes: 10,
+                factors: { cooling_score: 7, shade_score: 10, indoor: false, water_available: true },
+              },
+              comparison: {
+                stay: [
+                  { time: "NOW", score: 42 },
+                  { time: "+30 min", score: 56 },
+                  { time: "+60 min", score: 69 },
+                  { time: "+90 min", score: 78 },
+                ],
+                move: [
+                  { time: "NOW", score: 42 },
+                  { time: "+30 min", score: 42 },
+                  { time: "+60 min", score: 40 },
+                  { time: "+90 min", score: 45 },
+                ],
+              },
+              route: {
+                distance_km: 0.78,
+                walking_minutes: 10,
+                shape: "_dvvWo}~~rCwdHfiB",
+              },
+              recommendation: {
+                action: "MOVE_NOW",
+                reason: "Heat exposure is expected to become dangerous if you remain here. Seek a cooler location.",
+              },
+              all_places: [
+                { id: "blr_park_01", name: "Cubbon Park", latitude: 12.9763, longitude: 77.5929, type: "park", temperature: 28.5, icon: "🌳", cooling_type: "Dense Shaded Tree Canopy", distance_km: 0.78, relief_score: 42.0, water_available: true, indoor: false },
+                { id: "blr_library_01", name: "City Central Library, Cubbon Park", latitude: 12.9735, longitude: 77.5905, type: "library", temperature: 24.0, icon: "🏛️", cooling_type: "Air-Conditioned Indoor Haven", distance_km: 0.65, relief_score: 48.0, water_available: true, indoor: true },
+                { id: "blr_mall_01", name: "UB City Shaded Galleria & Plaza", latitude: 12.9719, longitude: 77.5958, type: "mall", temperature: 23.5, icon: "🏢", cooling_type: "Air-Conditioned Indoor Haven", distance_km: 0.85, relief_score: 50.0, water_available: true, indoor: true },
+              ],
+            };
+            setData(fallbackDemo);
+            setActiveDestination(fallbackDemo.destination);
+            setActiveRoute(fallbackDemo.route);
+            setLoading(false);
+            return;
+          }
           setError(err instanceof Error ? err.message : "Failed to load data.");
         }
       } finally {
